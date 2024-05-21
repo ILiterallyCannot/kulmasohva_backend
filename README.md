@@ -1,11 +1,17 @@
 # kulmasohva_backend
 
-requirments:
+requirements:
 node.js,
 express,
 jwt,
 authentication,
 mongodb
 
-install with npm install
-start with node server.js
+## quick setup
+
+1. install mongodb
+2. install mongodb compass
+3. clone repository
+4. install requirements with npm install
+5. start mongodb with brew/systemctl services start mongodb-community@7.0
+6. start backend with node server.js
