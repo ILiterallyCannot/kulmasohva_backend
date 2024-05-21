@@ -58,7 +58,7 @@ isModerator = (req, res, next) => {
         Role.find({ _id: { $in: user.roles } })
           .then((roles) => {
             for (let i = 0; i < roles.length; i++) {
-              if (roles[i].name === "moderator") {
+              if (roles[i].name === "moderator" || roles[i].name === "admin") {
                 next();
                 return;
               }
@@ -67,7 +67,7 @@ isModerator = (req, res, next) => {
           })
           .catch((err) => {
             console.log(err);
-            res.status(500).send({ message: err });
+            res.status(403).send({ message: "Moderator access required!" });
           });
       })
       .catch((err) => {
