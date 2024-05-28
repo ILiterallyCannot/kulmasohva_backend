@@ -4,7 +4,9 @@
   "description": "Node.js + MongoDB: JWT Authentication & Authorization",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon"
+
   },
   "keywords": [
     "node.js",
@@ -20,7 +22,8 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.3.5"
+    "mongoose": "^8.3.5",
+    "nodemon": "^3.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.12"
