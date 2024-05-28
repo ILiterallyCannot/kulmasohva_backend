@@ -6,7 +6,9 @@ const db = require("./app/models");
 const dbConfig = require("./app/config/db.config.js");
 const authRoutes = require("./app/routes/auth.routes.js");
 const userRoutes = require("./app/routes/user.routes.js");
+const postRoutes = require("./app/routes/post.routes.js")
 const Role = db.role;
+const User = db.user;
 
 db.mongoose
   .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
@@ -16,11 +18,38 @@ db.mongoose
   .then(() => {
     console.log("Successfully connect to MongoDB.");
     initial();
+    //updateUsers();
   })
   .catch((err) => {
     console.error("Connection error", err);
-    process.exit();
+    process.exit(1);
   });
+
+  db.mongoose.connection.on('error', err => {
+    console.error('MongoDB connection error:', err);
+  });
+  
+  db.mongoose.connection.on('disconnected', () => {
+    console.warn('MongoDB connection lost. Attempting to reconnect...');
+    db.mongoose.connect('mongodb://localhost:27017/kulmasohva_db', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  });
+
+  async function updateUsers() {
+    try {
+      await User.updateMany(
+        { posts: { $exists: false } },
+        { $set: { posts: [] } }
+      );
+      console.log('Updated users to add posts field');
+      db.mongoose.connection.close();
+    } catch (err) {
+      console.error('Error updating users', err);
+      db.mongoose.connection.close();
+    }
+  }
 
 var corsOptions = {
   origin: "http://localhost:3000",
@@ -42,6 +71,7 @@ app.get("/", (req, res) => {
 // routes
 authRoutes(app);
 userRoutes(app);
+postRoutes(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
