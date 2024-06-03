@@ -28,8 +28,6 @@ module.exports = function(app) {
 
   app.get("/api/test/users/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.getUserById);
   app.get("/api/test/users/username/:username", [authJwt.verifyToken, authJwt.isAdmin], controller.getUserByUsername);
-  app.get("/api/test/users/:id/roles", [authJwt.verifyToken, authJwt.isAdmin], controller.getRoleByUserId);
-  app.put("/api/test/users/:id/roles", [authJwt.verifyToken, authJwt.isAdmin], controller.updateUserRoles);
 
   app.get(
     "/api/test/users",
