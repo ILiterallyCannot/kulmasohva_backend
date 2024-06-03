@@ -6,50 +6,43 @@ const Role = db.role;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = (req, res) => {
-  const user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8),
-  });
-
-  user
-    .save()
-    .then((savedUser) => {
-      if (req.body.roles && req.body.roles.length > 0) {
-        Role.find({ name: { $in: req.body.roles } })
-          .then((roles) => {
-            savedUser.roles = roles.map((role) => role._id);
-            return savedUser.save();
-          })
-          .then(() => {
-            res.send({ message: "User was registered successfully!" });
-          })
-          .catch((err) => {
-            console.error(err);
-            res.status(500).send({ message: "Error assigning roles to user." });
-          });
-      } else {
-        Role.findOne({ name: "user" })
-          .then((role) => {
-            user.roles = [role._id];
-            return savedUser.save();
-          })
-          .then(() => {
-            res.send({ message: "User was registered successfully!" });
-          })
-          .catch((err) => {
-            console.error(err);
-            res
-              .status(500)
-              .send({ message: "Error assigning default role to user." });
-          });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send({ message: "Error saving user." });
+exports.signup = async (req, res) => {
+  try {
+    const user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 8),
     });
+
+    const savedUser = await user.save();
+    const userCount = await User.countDocuments();
+
+    if (userCount === 1) {
+      const role = await Role.findOne({ name: "admin" });
+      if (role) {
+        savedUser.roles = [role._id];
+        await savedUser.save();
+        res.send({
+          message: "First user was registered successfully as admin!",
+        });
+      } else {
+        res.status(500).send({ message: "Admin role not found." });
+      }
+    } else {
+      if (req.body.roles && req.body.roles.length > 0) {
+        const roles = await Role.find({ name: { $in: req.body.roles } });
+        user.roles = roles.map((role) => role._id);
+      } else {
+        const role = await Role.findOne({ name: "user" });
+        user.roles = [role._id];
+      }
+    await savedUser.save();
+    res.send({ message: "User was registered successfully!" });
+  }
+ } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: err.message });
+  }
 };
 
 exports.signin = (req, res) => {
