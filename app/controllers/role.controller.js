@@ -51,6 +51,5 @@ async function getRoleByUserId(req, res) {
   module.exports = {
     updateUserRoles,
     getRoleByUserId,
-    updateUserRoles,
     getAllRoles
   };
