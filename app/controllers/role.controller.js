@@ -21,10 +21,11 @@ async function getRoleByUserId(req, res) {
       if (!Array.isArray(roles)) {
         return res.status(400).send({ message: "Roles should be an array" });
       }
-  
+
+      const roleIds = roles.map(role => role.id);
       const user = await User.findByIdAndUpdate(
         userId,
-        { roles },
+        { roles: roleIds },
         { new: true }
       );
   

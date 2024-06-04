@@ -10,7 +10,7 @@ module.exports = function(app) {
     next();
   });
   
-  app.get("api/test/roles", [authJwt.verifyToken, authJwt.isAdmin], roleController.getAllRoles);
+  app.get("/api/test/roles", [authJwt.verifyToken, authJwt.isAdmin], roleController.getAllRoles);
   app.get("/api/test/users/:id/roles", [authJwt.verifyToken, authJwt.isAdmin], roleController.getRoleByUserId);
   app.put("/api/test/users/:id/roles", [authJwt.verifyToken, authJwt.isAdmin], roleController.updateUserRoles);
 };
