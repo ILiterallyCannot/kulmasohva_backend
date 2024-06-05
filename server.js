@@ -6,8 +6,8 @@ const db = require("./app/models");
 const dbConfig = require("./app/config/db.config.js");
 const authRoutes = require("./app/routes/auth.routes.js");
 const userRoutes = require("./app/routes/user.routes.js");
-const postRoutes = require("./app/routes/post.routes.js")
-const roleRoutes = require("./app/routes/role.routes.js")
+const postRoutes = require("./app/routes/post.routes.js");
+const roleRoutes = require("./app/routes/role.routes.js");
 const Role = db.role;
 const User = db.user;
 
@@ -23,31 +23,44 @@ db.mongoose
     process.exit(1);
   });
 
-  db.mongoose.connection.on('error', err => {
-    console.error('MongoDB connection error:', err);
-  });
-  
-  db.mongoose.connection.on('disconnected', () => {
-    console.warn('MongoDB connection lost. Attempting to reconnect...');
-    db.mongoose.connect('mongodb://localhost:27017/kulmasohva_db', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-  });
+db.mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
-  async function updateUsers() {
-    try {
-      await User.updateMany(
-        { posts: { $exists: false } },
-        { $set: { posts: [] } }
-      );
-      console.log('Updated users to add posts field');
-      db.mongoose.connection.close();
-    } catch (err) {
-      console.error('Error updating users', err);
-      db.mongoose.connection.close();
-    }
+db.mongoose.connection.on("disconnected", () => {
+  console.warn("MongoDB connection lost. Attempting to reconnect...");
+  db.mongoose.connect("mongodb://localhost:27017/kulmasohva_db", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+});
+
+async function updateUsers() {
+  try {
+    await User.updateMany(
+      {
+        name: { $exists: false },
+        surname: { $exists: false },
+        phonenumber: { $exists: false },
+        city: { $exists: false },
+        country: { $exists: false },
+      },
+      {
+        $set: {
+          name: "",
+          surname: "",
+          phonenumber: "",
+          city: "",
+          country: "",
+        },
+      }
+    );
+    console.log("Updated users to add missing fields");
+  } catch (err) {
+    console.error("Error updating users", err);
+    db.mongoose.connection.close();
   }
+}
 
 var corsOptions = {
   origin: "http://localhost:3000",

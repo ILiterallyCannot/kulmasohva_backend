@@ -46,6 +46,39 @@ async function getUserByUsername(req, res) {
   }
 }
 
+async function deleteUserById(req, res) {
+  try {
+    const user = await User.findByIdAndDelete({ _id: req.params.id });
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.json(user);
+  }
+  catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
+
+async function updateUserProfile(req, res) {
+  try {
+    const userId = req.params.id;
+    const updatedData = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId, 
+      { $set: updatedData },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.json({ message: 'User profile updated successfully', user: user });
+  }
+  catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
+
 module.exports = {
   userBoard,
   allAccess,
@@ -54,4 +87,6 @@ module.exports = {
   searchUsers,
   getUserById,
   getUserByUsername,
+  deleteUserById,
+  updateUserProfile
 };
