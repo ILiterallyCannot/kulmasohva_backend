@@ -8,6 +8,7 @@ const authRoutes = require("./app/routes/auth.routes.js");
 const userRoutes = require("./app/routes/user.routes.js");
 const postRoutes = require("./app/routes/post.routes.js");
 const roleRoutes = require("./app/routes/role.routes.js");
+const apartmentRoutes = require("./app/routes/apartment.routes.js")
 const Role = db.role;
 const User = db.user;
 
@@ -84,6 +85,7 @@ authRoutes(app);
 userRoutes(app);
 postRoutes(app);
 roleRoutes(app);
+apartmentRoutes(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
