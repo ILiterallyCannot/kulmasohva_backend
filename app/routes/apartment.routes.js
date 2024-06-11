@@ -12,4 +12,5 @@ module.exports = function (app) {
 
   app.get("/api/test/apartments", [authJwt.verifyToken], controller.getAllApartments);
   app.post("/api/test/apartments", [authJwt.verifyToken], controller.listApartment);
+  app.delete("/api/test/apartments/:id", [authJwt.verifyToken], controller.deleteApartment);
 };

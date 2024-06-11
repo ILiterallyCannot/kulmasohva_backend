@@ -24,3 +24,15 @@ exports.listApartment = (req, res) => {
     .then((data) => res.status(200).send(data))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
+
+exports.deleteApartment = (req, res) => {
+    Apartment.findByIdAndDelete(req.params.id).then((result) => {
+      if (!result) {
+        return res.status(404).send({ message: "Apartment not found" });
+      }
+      res.send({ message: "Apartment was deleted successfully!" });
+    })
+    .catch(() => {
+      res.status(500).send({ message: "Could not delete Apartment" });
+    });
+  };
