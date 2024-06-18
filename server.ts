@@ -2,13 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
-const db = require("./app/models");
-const dbConfig = require("./app/config/db.config.js");
-const authRoutes = require("./app/routes/auth.routes.js");
-const userRoutes = require("./app/routes/user.routes.js");
-const postRoutes = require("./app/routes/post.routes.js");
-const roleRoutes = require("./app/routes/role.routes.js");
-const apartmentRoutes = require("./app/routes/apartment.routes.js")
+const db = require("./dist/models");
+const dbConfig = require("./dist/config/db.config.js");
+const authRoutes = require("./dist/routes/auth.routes.js");
+const userRoutes = require("./dist/routes/user.routes.js");
+const postRoutes = require("./dist/routes/post.routes.js");
+const roleRoutes = require("./dist/routes/role.routes.js");
+const apartmentRoutes = require("./dist/routes/apartment.routes.js")
 const Role = db.role;
 const User = db.user;
 

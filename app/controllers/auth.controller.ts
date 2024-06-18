@@ -1,24 +1,24 @@
+import RoleModel, { IRole } from "../models/role.model";
+import UserModel from "../models/user.model";
+import { Req, Res } from "express";
 const config = require("../config/auth.config");
-const db = require("../models");
-const User = db.user;
-const Role = db.role;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = async (req, res) => {
+export const signup = async (req: Req, res: Res): Promise<void> => {
   try {
-    const user = new User({
+    const user = new UserModel({
       username: req.body.username,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
     });
 
     const savedUser = await user.save();
-    const userCount = await User.countDocuments();
+    const userCount = await UserModel.countDocuments();
 
     if (userCount === 1) {
-      const role = await Role.findOne({ name: "admin" });
+      const role = await RoleModel.findOne({ name: "admin" });
       if (role) {
         savedUser.roles = [role._id];
         await savedUser.save();
@@ -30,26 +30,28 @@ exports.signup = async (req, res) => {
       }
     } else {
       if (req.body.roles && req.body.roles.length > 0) {
-        const roles = await Role.find({ name: { $in: req.body.roles } });
-        user.roles = roles.map((role) => role._id);
+        const roles: IRole[] = await RoleModel.find({
+          name: { $in: req.body.roles },
+        });
+        user.roles = roles.map((role: IRole) => role._id);
       } else {
-        const role = await Role.findOne({ name: "user" });
-        user.roles = [role._id];
+        const role = await RoleModel.findOne({ name: "user" });
+        user.roles = role?.id;
       }
-    await savedUser.save();
-    res.send({ message: "User was registered successfully!" });
-  }
- } catch (err) {
+      await savedUser.save();
+      res.send({ message: "User was registered successfully!" });
+    }
+  } catch (err) {
     console.error(err);
-    res.status(500).send({ message: err.message });
+    res.status(500).send({ message: (err as Error).message });
   }
 };
 
-exports.signin = (req, res) => {
-  let token;
-  let authorities = [];
-  User.findOne({ username: req.body.username })
-    .populate("roles", "-__v")
+export const signin = async (req: Req, res: Res): Promise<void> => {
+  let token: string;
+  let authorities: string[] = [];
+  UserModel.findOne({ username: req.body.username })
+    .populate<{ roles: IRole[] }>("roles", "-__v")
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: "User not found." });

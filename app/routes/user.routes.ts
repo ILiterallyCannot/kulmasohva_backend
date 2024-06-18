@@ -1,8 +1,9 @@
-const { authJwt } = require("../middleware");
-const controller = require("../controllers/user.controller");
+import * as controller from "../controllers/user.controller";
+import { authJwt } from "../middleware";
+import { Next, Req, Res } from "express";
 
-module.exports = function(app) {
-  app.use(function(req, res, next) {
+module.exports = function (app: any) {
+  app.use(function (req: Req, res: Res, next: Next) {
     res.header(
       "Access-Control-Allow-Headers",
       "x-access-token, Origin, Content-Type, Accept"
@@ -27,9 +28,21 @@ module.exports = function(app) {
   );
 
   app.get("/api/test/users/:id", [authJwt.verifyToken], controller.getUserById);
-  app.get("/api/test/users/username/:username", [authJwt.verifyToken, authJwt.isAdmin], controller.getUserByUsername);
-  app.delete("/api/test/users/:id", [authJwt.verifyToken, authJwt.isAdmin], controller.deleteUserById);
-  app.put("/api/test/users/:id", [authJwt.verifyToken], controller.updateUserProfile);
+  app.get(
+    "/api/test/users/username/:username",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.getUserByUsername
+  );
+  app.delete(
+    "/api/test/users/:id",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.deleteUserById
+  );
+  app.put(
+    "/api/test/users/:id",
+    [authJwt.verifyToken],
+    controller.updateUserProfile
+  );
 
   app.get(
     "/api/test/users",

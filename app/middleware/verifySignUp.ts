@@ -1,9 +1,12 @@
-const db = require("../models");
-const User = db.user;
+import { Next, Req, Res } from "express";
+import RoleModel from "../models/role.model";
+import UserModel from "../models/user.model";
 
-const checkDuplicateUsernameOrEmail = (req, res, next) => {
+const ROLES = ["user", "admin", "moderator"];
+
+const checkDuplicateUsernameOrEmail = (req: Req, res: Res, next: Next) => {
   // Check if username exists
-  User.findOne({
+  UserModel.findOne({
     username: req.body.username,
   }).then((user) => {
     if (user) {
@@ -12,7 +15,7 @@ const checkDuplicateUsernameOrEmail = (req, res, next) => {
     }
 
     // Check if email exists
-    User.findOne({
+    UserModel.findOne({
       email: req.body.email,
     }).then((user) => {
       if (user) {
@@ -25,10 +28,12 @@ const checkDuplicateUsernameOrEmail = (req, res, next) => {
   });
 };
 
-checkRolesExisted = (req, res, next) => {
+const checkRolesExisted = async (req: Req, res: Res, next: Next) => {
   if (req.body.roles) {
+    const roles = await RoleModel.find().exec();
+    const roleNames = roles.map((role) => role.name);
     for (let i = 0; i < req.body.roles.length; i++) {
-      if (!ROLES.includes(req.body.roles[i])) {
+      if (!roleNames.includes(req.body.roles[i])) {
         res.status(400).send({
           message: `Failed! Role ${req.body.roles[i]} does not exist!`,
         });
@@ -45,4 +50,4 @@ const verifySignUp = {
   checkRolesExisted,
 };
 
-module.exports = verifySignUp;
+export default verifySignUp;

@@ -1,8 +1,9 @@
-const { authJwt } = require("../middleware");
-const controller = require("../controllers/post.controller");
+import * as controller from "../controllers/post.controller";
+import { authJwt } from "../middleware";
+import { Next, Req, Res } from "express";
 
-module.exports = function (app) {
-  app.use(function (req, res, next) {
+module.exports = function (app: any) {
+  app.use(function (req: Req, res: Res, next: Next) {
     res.header(
       "Access-Control-Allow-Headers",
       "x-access-token, Origin, Content-Type, Accept"
@@ -14,7 +15,11 @@ module.exports = function (app) {
 
   app.post("/api/test/posts", [authJwt.verifyToken], controller.createPost);
 
-  app.delete("/api/test/posts/:id", [authJwt.verifyToken, authJwt.isModerator, authJwt.isAdmin], controller.deletePost);
+  app.delete(
+    "/api/test/posts/:id",
+    [authJwt.verifyToken, authJwt.isModerator, authJwt.isAdmin],
+    controller.deletePost
+  );
 
   app.get(
     "/api/test/posts/user/:userID",
