@@ -1,25 +1,35 @@
-import { Router } from "express";
 import * as controller from "../controllers/auth.controller";
 import { verifySignUp } from "../middleware";
-import { Next, Req, Res } from "express";
+import { Router, Request as Req, Response as Res, NextFunction as Next } from "express";
 
-module.exports = function (app: Router) {
-  app.use(function (req: Req, res: Res, next: Next) {
-    res.header(
-      "Access-Control-Allow-Headers",
-      "x-access-token, Origin, Content-Type, Accept"
+export class AuthRouter {
+  public router: Router;
+
+  constructor() {
+    this.router = Router();
+    this.routes();
+  }
+
+  private routes(): void {
+    this.router.use("/", (req: Req, res: Res, next: Next) => {
+      res.header(
+        "Access-Control-Allow-Headers",
+        "x-access-token, Origin, Content-Type, Accept"
+      );
+      next();
+    });
+
+    this.router.post(
+      "/api/auth/signup",
+      [
+        verifySignUp.checkDuplicateUsernameOrEmail,
+        verifySignUp.checkRolesExisted,
+      ],
+      controller.signup
     );
-    next();
-  });
 
-  app.post(
-    "/api/auth/signup",
-    [
-      verifySignUp.checkDuplicateUsernameOrEmail,
-      verifySignUp.checkRolesExisted,
-    ],
-    controller.signup
-  );
+    this.router.post("/api/auth/signin", controller.signin);
+  }
+}
 
-  app.post("/api/auth/signin", controller.signin);
-};
+export default new AuthRouter().router;

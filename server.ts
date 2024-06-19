@@ -1,16 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const app = express();
+import { Request as Req, Response as Res, NextFunction as Next } from "express";
+import express from 'express';
+import AuthRouter from "./app/routes/auth.routes";
+import UserRouter from "./app/routes/user.routes";
+import PostRouter from "./app/routes/post.routes";
+import RoleRouter from "./app/routes/role.routes";
+import ApartmentRouter from "./app/routes/apartment.routes";
+import {dbConfig} from "./app/config/db.config"
+import UserModel from "./app/models/user.model";
+import RoleModel from "./app/models/role.model";
+import db from "./app/models"
+const cors = require('cors'); 
 
-const db = require("./dist/models");
-const dbConfig = require("./dist/config/db.config.js");
-const authRoutes = require("./dist/routes/auth.routes.js");
-const userRoutes = require("./dist/routes/user.routes.js");
-const postRoutes = require("./dist/routes/post.routes.js");
-const roleRoutes = require("./dist/routes/role.routes.js");
-const apartmentRoutes = require("./dist/routes/apartment.routes.js")
-const Role = db.role;
-const User = db.user;
+const app = express();
 
 db.mongoose
   .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`)
@@ -19,26 +20,23 @@ db.mongoose
     initial();
     //updateUsers();
   })
-  .catch((err) => {
+  .catch((err: Error) => {
     console.error("Connection error", err);
     process.exit(1);
   });
 
-db.mongoose.connection.on("error", (err) => {
+db.mongoose.connection.on("error", (err: Error) => {
   console.error("MongoDB connection error:", err);
 });
 
 db.mongoose.connection.on("disconnected", () => {
   console.warn("MongoDB connection lost. Attempting to reconnect...");
-  db.mongoose.connect("mongodb://localhost:27017/kulmasohva_db", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`);
 });
 
 async function updateUsers() {
   try {
-    await User.updateMany(
+    await UserModel.updateMany(
       {
         name: { $exists: false },
         surname: { $exists: false },
@@ -76,16 +74,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // simple route
-app.get("/", (req, res) => {
+app.get("/", (req: Req, res: Res) => {
   res.json({ message: "Welcome to my app." });
 });
 
 // routes
-authRoutes(app);
-userRoutes(app);
-postRoutes(app);
-roleRoutes(app);
-apartmentRoutes(app);
+app.use(AuthRouter);
+app.use(UserRouter);
+app.use(PostRouter);
+app.use(RoleRouter);
+app.use(ApartmentRouter);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
@@ -95,12 +93,12 @@ app.listen(PORT, () => {
 
 async function initial() {
   try {
-    const count = await Role.estimatedDocumentCount();
+    const count = await RoleModel.estimatedDocumentCount();
     if (count === 0) {
       await Promise.all([
-        new Role({ name: "user" }).save(),
-        new Role({ name: "moderator" }).save(),
-        new Role({ name: "admin" }).save(),
+        new RoleModel({ name: "user" }).save(),
+        new RoleModel({ name: "moderator" }).save(),
+        new RoleModel({ name: "admin" }).save(),
       ]);
       console.log("Roles added successfully.");
     }

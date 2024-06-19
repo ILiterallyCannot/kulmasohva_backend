@@ -1,29 +1,44 @@
+import {
+  NextFunction as Next,
+  Request as Req,
+  Response as Res,
+  Router,
+} from "express";
 import * as roleController from "../controllers/role.controller";
 import { authJwt } from "../middleware";
-import { Next, Req, Res } from "express";
 
-module.exports = function (app: any) {
-  app.use(function (req: Req, res: Res, next: Next) {
-    res.header(
-      "Access-Control-Allow-Headers",
-      "x-access-token, Origin, Content-Type, Accept"
+export class RoleRouter {
+  public router: Router;
+
+  constructor() {
+    this.router = Router();
+    this.routes();
+  }
+
+  private routes(): void {
+    this.router.use("/", (req: Req, res: Res, next: Next) => {
+      res.header(
+        "Access-Control-Allow-Headers",
+        "x-access-token, Origin, Content-Type, Accept"
+      );
+      next();
+    });
+    this.router.get(
+      "/api/v1/roles",
+      [authJwt.verifyToken, authJwt.isAdmin],
+      roleController.getAllRoles
     );
-    next();
-  });
+    this.router.get(
+      "/api/v1/users/:id/roles",
+      [authJwt.verifyToken, authJwt.isAdmin],
+      roleController.getRoleByUserId
+    );
+    this.router.put(
+      "/api/v1/users/:id/roles",
+      [authJwt.verifyToken, authJwt.isAdmin],
+      roleController.updateUserRoles
+    );
+  }
+}
 
-  app.get(
-    "/api/test/roles",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    roleController.getAllRoles
-  );
-  app.get(
-    "/api/test/users/:id/roles",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    roleController.getRoleByUserId
-  );
-  app.put(
-    "/api/test/users/:id/roles",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    roleController.updateUserRoles
-  );
-};
+export default new RoleRouter().router;

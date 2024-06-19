@@ -1,6 +1,11 @@
-import authJwt from "../middleware/authjwt";
+import {
+  NextFunction as Next,
+  Request as Req,
+  Response as Res,
+  Router,
+} from "express";
 import * as controller from "../controllers/apartment.controller";
-import { Router, Req, Res, Next } from "express";
+import authJwt from "../middleware/authjwt";
 
 export class ApartmentRouter {
   public router: Router;
@@ -19,18 +24,18 @@ export class ApartmentRouter {
       next();
     });
     this.router.get(
-      "/api/test/apartments",
+      "/api/v1/apartments",
       [authJwt.verifyToken],
       controller.getAllApartments
     );
     this.router.post(
-      "/api/test/apartments",
+      "/api/v1/apartments",
       [authJwt.verifyToken],
       controller.listApartment
     );
     this.router.delete(
-      "/api/test/apartments/:id",
-      [authJwt.verifyToken],
+      "/api/v1/apartments/:id",
+      [authJwt.verifyToken, authJwt.isModerator, authJwt.isAdmin],
       controller.deleteApartment
     );
   }
