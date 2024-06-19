@@ -1,5 +1,5 @@
 import ApartmentModel from "../models/apartment.model";
-import { Req, Res } from "express";
+import { Request as Req, Response as Res } from 'express';
 
 export const getAllApartments = async (req: Req, res: Res): Promise<void> => {
   try {
@@ -32,7 +32,7 @@ export const listApartment = async (req: Req, res: Res): Promise<void> => {
 
 export const deleteApartment = async (req: Req, res: Res): Promise<void> => {
   try {
-    const result = ApartmentModel.findByIdAndDelete(req.params.id);
+    const result = await ApartmentModel.findByIdAndDelete(req.params.id);
     if (!result) {
       res.status(404).send({ message: "Apartment not found" });
       return;

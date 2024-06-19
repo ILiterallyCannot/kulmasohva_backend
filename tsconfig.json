@@ -6,10 +6,13 @@
         "dom.iterable",
         "esnext"
       ],
-      "typeRoots": [
+      "types": [
         "node",
-        "src/@types",
       ],
+      "typeRoots": [
+        "./node_modules/@types",
+        "./src/@types"
+    ],
       "module": "commonjs",
       "strict": true,
       "allowJs": false,

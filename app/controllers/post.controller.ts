@@ -1,5 +1,5 @@
 import PostModel from "../models/post.model";
-import { Req, Res } from "express";
+import { Request as Req, Response as Res } from 'express';
 
 export const createPost = async (req: Req, res: Res): Promise<void> => {
   try {

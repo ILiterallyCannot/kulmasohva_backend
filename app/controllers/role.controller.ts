@@ -1,6 +1,6 @@
 import RoleModel, { IRole } from "../models/role.model";
 import UserModel from "../models/user.model";
-import { Req, Res } from "express";
+import { Request as Req, Response as Res } from 'express';
 
 export const getRoleByUserId = async (req: Req, res: Res): Promise<void> => {
   try {

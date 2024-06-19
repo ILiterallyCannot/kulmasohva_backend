@@ -1,5 +1,5 @@
 import UserModel from "../models/user.model";
-import { Req, Res } from "express";
+import { Request as Req, Response as Res } from 'express';
 
 export const allAccess = (req: Req, res: Res): void => {
   res.status(200).send("Public Content visible to anyone.");

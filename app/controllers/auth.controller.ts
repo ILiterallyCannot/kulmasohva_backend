@@ -1,7 +1,7 @@
 import RoleModel, { IRole } from "../models/role.model";
 import UserModel from "../models/user.model";
-import { Req, Res } from "express";
-const config = require("../config/auth.config");
+import { Request as Req, Response as Res } from 'express';
+import * as config from "../config/auth.config";
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -70,7 +70,7 @@ export const signin = async (req: Req, res: Res): Promise<void> => {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
       }
 
-      token = jwt.sign({ id: user.id }, config.secret, {
+      token = jwt.sign({ id: user.id }, config.JWT_SECRET, {
         algorithm: "HS256",
         allowInsecureKeySizes: true,
         expiresIn: 86400, // 24 hours

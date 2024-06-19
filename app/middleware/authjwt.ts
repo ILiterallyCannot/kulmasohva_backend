@@ -1,4 +1,4 @@
-import { Next, Req, Res } from "express";
+import { Request as Req, Response as Res, NextFunction as Next } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import * as secret from "../config/auth.config";
 import RoleModel from "../models/role.model";
