@@ -1,16 +1,10 @@
 import { Request as Req, Response as Res, NextFunction as Next } from "express";
-import express from 'express';
-import AuthRouter from "./app/routes/auth.routes";
-import UserRouter from "./app/routes/user.routes";
-import PostRouter from "./app/routes/post.routes";
-import RoleRouter from "./app/routes/role.routes";
-import ApartmentRouter from "./app/routes/apartment.routes";
-import {dbConfig} from "./app/config/db.config"
-import UserModel from "./app/models/user.model";
-import RoleModel from "./app/models/role.model";
-import db from "./app/models"
-const cors = require('cors'); 
+import express from "express";
+import { dbConfig } from "./app/config/db.config";
+import routers from "./app/routes";
+import db, { models } from "./app/models";
 
+const cors = require("cors");
 const app = express();
 
 db.mongoose
@@ -31,12 +25,14 @@ db.mongoose.connection.on("error", (err: Error) => {
 
 db.mongoose.connection.on("disconnected", () => {
   console.warn("MongoDB connection lost. Attempting to reconnect...");
-  db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`);
+  db.mongoose.connect(
+    `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
+  );
 });
 
 async function updateUsers() {
   try {
-    await UserModel.updateMany(
+    await models.user.updateMany(
       {
         name: { $exists: false },
         surname: { $exists: false },
@@ -79,11 +75,10 @@ app.get("/", (req: Req, res: Res) => {
 });
 
 // routes
-app.use(AuthRouter);
-app.use(UserRouter);
-app.use(PostRouter);
-app.use(RoleRouter);
-app.use(ApartmentRouter);
+routers.forEach((router) => {
+  // routes are imported from app/routes/index.ts
+  app.use(router);
+});
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
@@ -93,12 +88,12 @@ app.listen(PORT, () => {
 
 async function initial() {
   try {
-    const count = await RoleModel.estimatedDocumentCount();
+    const count = await models.role.estimatedDocumentCount();
     if (count === 0) {
       await Promise.all([
-        new RoleModel({ name: "user" }).save(),
-        new RoleModel({ name: "moderator" }).save(),
-        new RoleModel({ name: "admin" }).save(),
+        new models.role({ name: "user" }).save(),
+        new models.role({ name: "moderator" }).save(),
+        new models.role({ name: "admin" }).save(),
       ]);
       console.log("Roles added successfully.");
     }
